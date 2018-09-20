@@ -25,6 +25,6 @@ service whose value derives, entirely or substantially, from the functionality o
 Any license notice or attribution required by the License must also include this Commons Cause
 License Condition notice.
 
-For purposes of the clause above, the “Licensor” is Redis Labs Ltd., the “License” is the Apache
-License, Version 2.0, and the Software is the PraxKit software provided with this
-notice.
+For purposes of the clause above, the “Licensor” are Andreas Ch. Kapp and Andrea S. Kapp, the 
+“License” is the Apache License, Version 2.0, and the Software is the PraxKit software provided 
+with this notice.
