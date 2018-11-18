@@ -3,25 +3,28 @@
 #
 # This configuration file is loaded before any dependency and
 # is restricted to this project.
-use Mix.Config
 
 # General application configuration
+use Mix.Config
+
 config :praxkit,
   ecto_repos: [Praxkit.Repo]
 
 # Configures the endpoint
 config :praxkit, PraxkitWeb.Endpoint,
   url: [host: "localhost"],
-  secret_key_base: "BapKE1nubLuBFChDEUydDRYNf7ZWfXLr0sjKfXcPZuXJYHY79qvfLPjfdms1E1q8",
+  secret_key_base: "VQ9ZJy1Bf+3+fvlmvul6beOSzYMvKkdLKOUw7lKDLgFiX4OMjCAJY39IyGGPn7Ck",
   render_errors: [view: PraxkitWeb.ErrorView, accepts: ~w(html json)],
-  pubsub: [name: Praxkit.PubSub,
-           adapter: Phoenix.PubSub.PG2]
+  pubsub: [name: Praxkit.PubSub, adapter: Phoenix.PubSub.PG2]
 
 # Configures Elixir's Logger
 config :logger, :console,
   format: "$time $metadata[$level] $message\n",
-  metadata: [:user_id]
+  metadata: [:request_id]
+
+# Use Jason for JSON parsing in Phoenix
+config :phoenix, :json_library, Jason
 
 # Import environment specific config. This must remain at the bottom
 # of this file so it overrides the configuration defined above.
-import_config "#{Mix.env}.exs"
+import_config "#{Mix.env()}.exs"
