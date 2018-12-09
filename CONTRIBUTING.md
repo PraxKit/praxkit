@@ -100,7 +100,7 @@ Please adhere to the coding conventions in the project (indentation, accurate co
    # Navigate to the newly cloned directory
    cd PraxKit
    # Assign the original repo to a remote called "upstream"
-   git remote add upstream https://github.com/smpallen99/PraxKit
+   git remote add upstream https://github.com/PraxKit/praxkit.git
    ```
 
 1. If you cloned a while ago, get the latest changes from upstream, and update your fork:
