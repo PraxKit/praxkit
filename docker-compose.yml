@@ -1,0 +1,18 @@
+version: "3.5"
+services:
+  db:
+    container_name: "praxkit_postgres"
+    image: postgres:12
+    command: 'postgres -c "max_connections=200"'
+    ports:
+      - "5432:5432"
+    volumes:
+      - type: volume
+        source: my-postgres-data
+        target: /var/lib/postgresql/data
+        volume:
+          nocopy: true
+volumes:
+  my-postgres-data:
+  deps:
+  build:
