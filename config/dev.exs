@@ -3,7 +3,7 @@ use Mix.Config
 # Configure your database
 config :praxkit, Praxkit.Repo,
   username: "postgres",
-  password: "postgres",
+  password: "example",
   database: "praxkit_dev",
   hostname: "localhost",
   show_sensitive_data_on_connection_error: true,
@@ -75,5 +75,4 @@ config :phoenix, :stacktrace_depth, 20
 # Initialize plugs at runtime for faster development compilation
 config :phoenix, :plug_init_mode, :runtime
 
-config :praxkit, Praxkit.Mailer,
-  adapter: Bamboo.LocalAdapter
+config :praxkit, Praxkit.Mailer, adapter: Bamboo.LocalAdapter
