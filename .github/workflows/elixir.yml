@@ -46,6 +46,6 @@ jobs:
     - name: Check Formatting
       run: mix format --check-formatted
       working-directory: praxkit
-    - name: Run Credo
-      run: mix credo --strict
-      working-directory: praxkit
+   # - name: Run Credo
+   #   run: mix credo --strict
+   #   working-directory: praxkit
