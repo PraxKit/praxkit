@@ -11,22 +11,25 @@ services:
       dockerfile: nginx.dockerfile
     container_name: nginx
     depends_on:
-      - php
-      - mysql
-      - redis
+      - db
+      - app
     ports:
       - 80:80
       - 443:443
     volumes:
       - ./src:/var/www/html
     networks:
-      - laravel
+      - praxkitnet
       
   app:
+    build: 
+      context: ./praxkit
+      dockerfile: ./phx.dockerfile
     container_name: "praxkit"
-    depends_on: db
+    depends_on: 
+      - db
     volumes:
-      - .:/var/www/html
+      - ./praxkit:/var/www/html
     networks:
       - praxkitnet
 
@@ -50,5 +53,4 @@ services:
       - praxkitnet
 volumes:
   my-postgres-data: # named volumes can be managed easier using docker-compose
-  deps:
-  build:
+
