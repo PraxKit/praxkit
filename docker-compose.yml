@@ -1,7 +1,38 @@
-version: "3.5"
+version: "3.8"
+
+networks:
+  praxkitnet:
+    name: praxkitnet
+
 services:
+  nginx:
+    build:
+      context: .
+      dockerfile: nginx.dockerfile
+    container_name: nginx
+    depends_on:
+      - php
+      - mysql
+      - redis
+    ports:
+      - 80:80
+      - 443:443
+    volumes:
+      - ./src:/var/www/html
+    networks:
+      - laravel
+      
+  app:
+    container_name: "praxkit"
+    depends_on: db
+    volumes:
+      - .:/var/www/html
+    networks:
+      - praxkitnet
+
+
   db:
-    container_name: "praxkit_postgres"
+    container_name: "praxkitdb"
     image: postgres:12
     restart: always
     environment:
@@ -15,6 +46,8 @@ services:
         target: /var/lib/postgresql12/data
         volume:
           nocopy: true
+    networks:
+      - praxkitnet
 volumes:
   my-postgres-data: # named volumes can be managed easier using docker-compose
   deps:
