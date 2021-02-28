@@ -23,3 +23,5 @@ erl_crash.dump
 .DS_Store
 
 node_modules/
+praxkit/.bash_history
+praxkit/.config/configstore/update-notifier-npm.json

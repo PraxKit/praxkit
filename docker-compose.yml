@@ -31,7 +31,7 @@ services:
     ports:
       - 4000:4000
     volumes:
-      - ./praxkit:/var/www/html
+      - ./praxkit:/opt/app
     networks:
       - praxkitnet
 
