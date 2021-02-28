@@ -3,9 +3,9 @@ use Mix.Config
 # Configure your database
 config :praxkit, Praxkit.Repo,
   username: "postgres",
-  password: "postgres",
+  password: "example",
   database: "praxkit_dev",
-  hostname: "localhost",
+  hostname: "db",
   show_sensitive_data_on_connection_error: true,
   pool_size: 10
 

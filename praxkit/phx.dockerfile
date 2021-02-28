@@ -1,8 +1,8 @@
-FROM bitwalker/alpine-elixir-phoenix:1.10.3
+FROM bitwalker/alpine-elixir-phoenix:latest
 
 # Set exposed ports
 EXPOSE 5000
-ENV PORT=5000 MIX_ENV=prod
+ENV PORT=5000 MIX_ENV=dev
 
 # Cache elixir deps
 ADD mix.exs mix.lock ./

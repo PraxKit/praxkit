@@ -35,3 +35,9 @@ Start your Phoenix app with:
 You can also run your app inside IEx (Interactive Elixir) as:
 
     $ iex -S mix phx.server
+
+changes
+
+*  https://hub.docker.com/r/bitwalker/alpine-elixir-phoenix
+*  dev.exs:   hostname: "db"
+*  ENV PORT=5000 MIX_ENV=dev insted of prod

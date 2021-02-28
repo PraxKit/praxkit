@@ -9,7 +9,7 @@ services:
     build:
       context: .
       dockerfile: nginx.dockerfile
-    container_name: nginx
+    container_name: nginxserv
     depends_on:
       - db
       - app
@@ -28,6 +28,8 @@ services:
     container_name: "praxkit"
     depends_on: 
       - db
+    ports:
+      - 4000:4000
     volumes:
       - ./praxkit:/var/www/html
     networks:
