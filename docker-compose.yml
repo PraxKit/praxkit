@@ -38,7 +38,7 @@ services:
 
   db:
     container_name: "praxkitdb"
-    image: postgres:12
+    image: postgres:14
     restart: always
     environment:
       POSTGRES_PASSWORD: example
