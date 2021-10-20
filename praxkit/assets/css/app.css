@@ -1,7 +1,17 @@
 /* This file is for your main application CSS */
 @import "./phoenix.css";
 
-/* Alerts and form errors used by phx.new */
+@import "tailwindcss/base";
+
+@import "tailwindcss/components";
+
+@import "tailwindcss/utilities";
+
+@import "./components/buttons.css";
+
+
+
+/* TOTO move to Tailwind: Alerts and form errors used by phx.new */
 .alert {
   padding: 15px;
   margin-bottom: 20px;
