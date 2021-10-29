@@ -3,6 +3,9 @@ module.exports = {
       "postcss-import": {},
       tailwindcss: {},
       autoprefixer: {},
-      "postcss-nested": {}
+      "postcss-nested": {},
+      cssnano: {
+        preset: "default",
+      },
     }
   }

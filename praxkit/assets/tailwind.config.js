@@ -1,8 +1,11 @@
+const defaultTheme = require('tailwindcss/defaultTheme')
+
 module.exports = {
   mode: 'jit',
   theme: {
     fontFamily: {
       sans: [
+        "Inter var", ...defaultTheme.fontFamily.sans,
         // "system-ui",
         "-apple-system",
         // "BlinkMacSystemFont",
@@ -172,7 +175,9 @@ module.exports = {
   variants: {
     //backgroundColor: ["responsive", "hover", "focus", "active"]
   },
-  plugins: [],
+  plugins: [require('tailwindcss-font-inter')({ 
+    importFontFace: false,
+  })],
   purge: [
     '../lib/**/*.ex',
     '../lib/**/*.leex',
