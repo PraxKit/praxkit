@@ -7,6 +7,8 @@
     "watch": "webpack --mode development --watch"
   },
   "devDependencies": {
+    "@tailwindcss/forms": "^0.3.4",
+    "@tailwindcss/typography": "^0.4.1",
     "autoprefixer": "^10.3.7",
     "cssnano": "^5.0.8",
     "postcss": "^8.3.9",
@@ -16,12 +18,13 @@
     "tailwindcss-font-inter": "^3.0.0"
   },
   "dependencies": {
-    "@tailwindcss/forms": "^0.3.4",
+    "alpinejs": "^3.5.0",
     "chart.js": "^2.9.4",
     "leaflet": "^1.7.1",
     "nprogress": "^0.2.0",
     "phoenix": "file:../deps/phoenix",
     "phoenix_html": "file:../deps/phoenix_html",
-    "phoenix_live_view": "file:../deps/phoenix_live_view"
+    "phoenix_live_view": "file:../deps/phoenix_live_view",
+    "topbar": "^1.0.1"
   }
 }
