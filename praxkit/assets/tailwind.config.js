@@ -175,9 +175,12 @@ module.exports = {
   variants: {
     //backgroundColor: ["responsive", "hover", "focus", "active"]
   },
-  plugins: [require('tailwindcss-font-inter')({ 
+  plugins: [
+    require('tailwindcss-font-inter')({ 
     importFontFace: false,
-  })],
+    }),
+    require('@tailwindcss/forms'),
+  ],
   purge: [
     '../lib/**/*.ex',
     '../lib/**/*.leex',
