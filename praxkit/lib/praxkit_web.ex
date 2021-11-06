@@ -51,6 +51,24 @@ defmodule PraxkitWeb do
     end
   end
 
+  # Used for admin area.
+  def live_view_admin do
+    quote do
+      use Phoenix.LiveView,
+        layout: {PraxkitWeb.Admin.LayoutView, "live.html"}
+
+      unquote(view_helpers())
+    end
+  end
+
+  def live_view_no_layout do
+    quote do
+      use Phoenix.LiveView
+
+      unquote(view_helpers())
+    end
+  end
+
   def live_component do
     quote do
       use Phoenix.LiveComponent
@@ -81,8 +99,9 @@ defmodule PraxkitWeb do
       # Use all HTML functionality (forms, tags, etc)
       use Phoenix.HTML
 
-      # Import LiveView and .heex helpers (live_render, live_patch, <.form>, etc)
+      # Import LiveView helpers (live_render, live_component, live_patch, etc)
       import Phoenix.LiveView.Helpers
+      import PraxkitWeb.LiveHelpers
 
       # Import basic rendering functionality (render, render_layout, etc)
       import Phoenix.View
@@ -90,6 +109,9 @@ defmodule PraxkitWeb do
       import PraxkitWeb.ErrorHelpers
       import PraxkitWeb.Gettext
       alias PraxkitWeb.Router.Helpers, as: Routes
+
+      import PraxkitWeb.Views.AppInfo
+      import PraxkitWeb.SharedComponents
     end
   end
 
@@ -98,5 +120,15 @@ defmodule PraxkitWeb do
   """
   defmacro __using__(which) when is_atom(which) do
     apply(__MODULE__, which, [])
+  end
+
+  # Used by Pow Mailers
+  def mailer_view do
+    quote do
+      use Phoenix.View, root: "lib/praxkit_web/templates",
+                        namespace: PraxkitWeb
+
+      use Phoenix.HTML
+    end
   end
 end

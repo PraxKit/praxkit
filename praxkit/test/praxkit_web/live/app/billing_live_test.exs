@@ -1,0 +1,22 @@
+defmodule PraxkitWeb.App.BillingLiveTest do
+  use PraxkitWeb.ConnCase
+
+  import Phoenix.LiveViewTest
+
+  describe "Index as not signed in" do
+    test "redirects to sign in", %{conn: conn} do
+      assert {:error, {:redirect, %{to: path}}} = live(conn, Routes.app_billing_index_path(conn, :index))
+      assert path =~ "/app/session/new"
+    end
+  end
+
+  describe "Index" do
+    setup [:register_and_log_in_user]
+
+    test "display team page", %{conn: conn} do
+      {:ok, _index_live, html} = live(conn, Routes.app_billing_index_path(conn, :index))
+
+      assert html =~ "Billing"
+    end
+  end
+end

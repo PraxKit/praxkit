@@ -1,5 +1,4 @@
 const defaultTheme = require('tailwindcss/defaultTheme')
-
 module.exports = {
   mode: 'jit',
   theme: {
@@ -175,17 +174,18 @@ module.exports = {
   variants: {
     //backgroundColor: ["responsive", "hover", "focus", "active"]
   },
-  plugins: [
-    require('tailwindcss-font-inter')({ 
-    importFontFace: false,
-    }),
-    require('@tailwindcss/forms'),
-  ],
   purge: [
-    '../lib/**/*.ex',
-    '../lib/**/*.leex',
-    '../lib/**/*.heex',
-    '../lib/**/*.eex',
-    './js/**/*.js'
+    "../lib/**/*.eex",
+    "../lib/**/*.leex",
+    "../lib/**/*.heex",
+    "../lib/**/*_view.ex",
+    "../lib/**/views/*.ex"
   ],
-};
+  plugins: [
+    require('@tailwindcss/typography'),
+    require('daisyui'),
+    require('tailwindcss-font-inter')({ 
+      importFontFace: false,
+    }),
+  ]
+}

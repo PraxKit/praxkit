@@ -7,8 +7,12 @@ defmodule PraxkitWeb.Endpoint do
   @session_options [
     store: :cookie,
     key: "_praxkit_key",
-    signing_salt: "ZpZqd42b"
+    signing_salt: "PTH1ZHM/"
   ]
+
+  socket "/socket", PraxkitWeb.UserSocket,
+    websocket: true,
+    longpoll: false
 
   socket "/live", Phoenix.LiveView.Socket, websocket: [connect_info: [session: @session_options]]
 
@@ -38,6 +42,9 @@ defmodule PraxkitWeb.Endpoint do
   plug Plug.RequestId
   plug Plug.Telemetry, event_prefix: [:phoenix, :endpoint]
 
+  # BEFORE plug Plug.Parsers
+  plug PraxkitWeb.Plugs.StripePayload
+
   plug Plug.Parsers,
     parsers: [:urlencoded, :multipart, :json],
     pass: ["*/*"],
@@ -46,5 +53,10 @@ defmodule PraxkitWeb.Endpoint do
   plug Plug.MethodOverride
   plug Plug.Head
   plug Plug.Session, @session_options
+  plug Pow.Plug.Session, otp_app: :praxkit
   plug PraxkitWeb.Router
+
+  if sandbox = Application.get_env(:praxkit, :sandbox) do
+    plug Phoenix.Ecto.SQL.Sandbox, sandbox: sandbox
+  end
 end

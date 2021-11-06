@@ -34,7 +34,7 @@ if config_env() == :prod do
       You can generate one by calling: mix phx.gen.secret
       """
 
-  app_name =
+      app_name =
         System.get_env("FLY_APP_NAME") ||
           raise "FLY_APP_NAME not available"
 
@@ -59,7 +59,7 @@ if config_env() == :prod do
   # If you are doing OTP releases, you need to instruct Phoenix
   # to start each relevant endpoint:
   #
-  #     config :praxkit, PraxkitWeb.Endpoint, server: true
+  config :praxkit, PraxkitWeb.Endpoint, server: true
   #
   # Then you can assemble a release by calling `mix release`.
   # See `mix help release` for more information.

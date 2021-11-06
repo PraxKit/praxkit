@@ -1,85 +1,83 @@
-# Using the Hex.pm docker images. You have much better version control for
-# Elixir, Erlang and Alpine.
-#
-#   - https://hub.docker.com/r/hexpm/elixir/tags
-#   - Ex: hexpm/elixir:1.11.2-erlang-23.3.2-alpine-3.13.3
-#
-# Debugging Notes:
-#
-#   docker run -it --rm praxkit /bin/ash
+ARG MIX_ENV="prod"
 
-###
-### Fist Stage - Building the Release
-###
-FROM hexpm/elixir:1.12.3-erlang-24.1.2-alpine-3.14.2 AS build
+FROM hexpm/elixir:1.12.2-erlang-22.3.4.13-alpine-3.12.1 as build
 
 # install build dependencies
-RUN apk add --no-cache build-base npm
+RUN apk add --no-cache build-base git python3 curl npm
 
 # prepare build dir
 WORKDIR /app
-
-# extend hex timeout
-ENV HEX_HTTP_TIMEOUT=20
 
 # install hex + rebar
 RUN mix local.hex --force && \
     mix local.rebar --force
 
-# set build ENV as prod
-ENV MIX_ENV=prod
-ENV SECRET_KEY_BASE=nokey
+# set build ENV
+ARG MIX_ENV
+ENV MIX_ENV="${MIX_ENV}"
 
-# Copy over the mix.exs and mix.lock files to load the dependencies. If those
-# files don't change, then we don't keep re-fetching and rebuilding the deps.
-COPY mix.exs mix.lock ./
-COPY config config
+# install mix dependencies
+COPY mix.exs mix.lock .
+RUN mix deps.get --only $MIX_ENV
+RUN mkdir config
 
-RUN mix deps.get --only prod && \
-    mix deps.compile
+# Dependencies sometimes use compile-time configuration. Copying
+# these compile-time config files before we compile dependencies
+# ensures that any relevant config changes will trigger the dependencies
+# to be re-compiled.
+COPY config/config.exs config/$MIX_ENV.exs config/
+RUN mix deps.compile
 
-# install npm dependencies
-# COPY assets/package.json assets/package-lock.json ./assets/
-# RUN npm --prefix ./assets ci --progress=false --no-audit --loglevel=error
-
-COPY priv priv
-COPY assets assets
-
-# NOTE: If using TailwindCSS, it uses a special "purge" step and that requires
-# the code in `lib` to see what is being used. Uncomment that here before
-# running the npm deploy script if that's the case.
-# COPY lib lib
-
-# build assets
-#RUN npm run --prefix ./assets deploy
-RUN mix phx.digest
-
-# copy source here if not using TailwindCSS
+# compile and build the release
 COPY lib lib
 
-# compile and build release
-COPY rel rel
-RUN mix do compile, release
+# Note: if your project uses a to/ol like https://purgecss.com,
+# which customizes asset compilation based on what it finds in
+# your Elixir templates, you will need to move the asset compilation
+# step down so that `lib` is available.
+COPY assets assets
+RUN cd assets && npm install
+RUN mix assets.deploy
 
-###
-### Second Stage - Setup the Runtime Environment
-###
+RUN mix compile
+# changes to config/runtime.exs don't require recompiling the code
+COPY config/runtime.exs config/
+# uncomment COPY if rel/ exists
+# COPY rel rel
+RUN mix release
 
-# prepare release docker image
-FROM alpine:3.14.2 AS app
+# Start a new build stage so that the final image will only contain
+# the compiled release and other runtime necessities
+FROM alpine:3.12.1 AS app
 RUN apk add --no-cache libstdc++ openssl ncurses-libs
 
-WORKDIR /app
+ARG MIX_ENV
+ENV USER="elixir"
 
-RUN chown nobody:nobody /app
+WORKDIR "/home/${USER}/app"
+# Creates an unprivileged user to be used exclusively to run the Phoenix app
+RUN \
+  addgroup \
+   -g 1000 \
+   -S "${USER}" \
+  && adduser \
+   -s /bin/sh \
+   -u 1000 \
+   -G "${USER}" \
+   -h /home/elixir \
+   -D "${USER}" \
+  && su "${USER}"
 
-USER nobody:nobody
+# Everything from this line onwards will run in the context of the unprivileged user.
+USER "${USER}"
 
-COPY --from=build --chown=nobody:nobody /app/_build/prod/rel/praxkit ./
+COPY --from=build --chown="${USER}":"${USER}" /app/_build/"${MIX_ENV}"/rel/praxkit ./
 
-ENV HOME=/app
-ENV MIX_ENV=prod
-ENV SECRET_KEY_BASE=nokey
-ENV PORT=4000
+# Copy Docker entrypoint
+# COPY priv/scripts/docker-entrypoint.sh ./
+# RUN chmod a+x docker-entrypoint.sh
 
-CMD ["bin/praxkit", "start"]
+ENTRYPOINT ["bin/praxkit"]
+
+CMD ["eval 'Deployer.Release.migrate'"]
+CMD ["start"]

@@ -5,8 +5,17 @@ defmodule Praxkit.Application do
 
   use Application
 
-  @impl true
   def start(_type, _args) do
+    create_stripe_customer_service =
+      if Application.get_env(:praxkit, :env) == :test,
+        do: Praxkit.Billing.CreateStripeCustomer.Stub,
+        else: Praxkit.Billing.CreateStripeCustomer
+
+    webhook_processor_service =
+      if Application.get_env(:praxkit, :env) == :test,
+        do: Praxkit.Billing.WebhookProcessor.Stub,
+        else: Praxkit.Billing.WebhookProcessor
+
     children = [
       # Start the Ecto repository
       Praxkit.Repo,
@@ -15,9 +24,13 @@ defmodule Praxkit.Application do
       # Start the PubSub system
       {Phoenix.PubSub, name: Praxkit.PubSub},
       # Start the Endpoint (http/https)
-      PraxkitWeb.Endpoint
+      PraxkitWeb.Endpoint,
       # Start a worker by calling: Praxkit.Worker.start_link(arg)
       # {Praxkit.Worker, arg}
+      {Oban, oban_config()},
+
+      create_stripe_customer_service,
+      webhook_processor_service
     ]
 
     # See https://hexdocs.pm/elixir/Supervisor.html
@@ -28,9 +41,12 @@ defmodule Praxkit.Application do
 
   # Tell Phoenix to update the endpoint configuration
   # whenever the application is updated.
-  @impl true
   def config_change(changed, _new, removed) do
     PraxkitWeb.Endpoint.config_change(changed, removed)
     :ok
+  end
+
+  defp oban_config do
+    Application.fetch_env!(:praxkit, Oban)
   end
 end

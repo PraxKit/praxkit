@@ -4,28 +4,49 @@ defmodule Praxkit.AccountsFixtures do
   entities via the `Praxkit.Accounts` context.
   """
 
+  alias Praxkit.Accounts.Account
+  alias Praxkit.Accounts
+
   def unique_user_email, do: "user#{System.unique_integer()}@example.com"
   def valid_user_password, do: "hello world!"
 
-  def valid_user_attributes(attrs \\ %{}) do
-    Enum.into(attrs, %{
-      email: unique_user_email(),
-      password: valid_user_password()
-    })
-  end
-
-  def user_fixture(attrs \\ %{}) do
-    {:ok, user} =
-      attrs
-      |> valid_user_attributes()
-      |> Praxkit.Accounts.register_user()
+  def user_fixture(%Account{} = account, attrs) do
+    attrs = Enum.into(attrs, %{email: unique_user_email(), password: valid_user_password(), password_confirmation: valid_user_password()})
+    {:ok, user} = Praxkit.Accounts.register_user(account, attrs)
 
     user
   end
 
+  def user_fixture(%Account{} = account), do: user_fixture(account, %{})
+
+  def user_fixture(attrs) do
+    account = account_fixture()
+    user_fixture(account, attrs)
+  end
+
+  def user_fixture() do
+    account = account_fixture()
+    user_fixture(account, %{})
+  end
+
   def extract_user_token(fun) do
-    {:ok, captured_email} = fun.(&"[TOKEN]#{&1}[TOKEN]")
-    [_, token | _] = String.split(captured_email.text_body, "[TOKEN]")
+    {:ok, captured} = fun.(&"[TOKEN]#{&1}[TOKEN]")
+    [_, token, _] = String.split(captured.text_body, "[TOKEN]")
     token
+  end
+
+  def user_with_account_fixture(attrs \\ %{}) do
+    account_fixture()
+    |> user_fixture(attrs)
+    |> Praxkit.Repo.preload(:account)
+  end
+
+  def account_fixture(attrs \\ %{}) do
+    {:ok, account} =
+      attrs
+      |> Enum.into(%{name: "some name"})
+      |> Accounts.create_account()
+
+    account
   end
 end

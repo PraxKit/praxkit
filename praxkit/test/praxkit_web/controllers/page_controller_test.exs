@@ -1,8 +1,19 @@
 defmodule PraxkitWeb.PageControllerTest do
-  use PraxkitWeb.ConnCase
+  use PraxkitWeb.ConnCase, async: true
 
-  test "GET /", %{conn: conn} do
-    conn = get(conn, "/")
-    assert html_response(conn, 200) =~ "Welcome to Phoenix!"
+  describe "privacy" do
+    test "renders page", %{conn: conn} do
+      conn = get(conn, "/privacy")
+      response = html_response(conn, 200)
+      assert response =~ "Privacy"
+    end
+  end
+
+  describe "terms" do
+    test "renders page", %{conn: conn} do
+      conn = get(conn, "/terms-and-conditions")
+      response = html_response(conn, 200)
+      assert response =~ "Terms and Conditions"
+    end
   end
 end

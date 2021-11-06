@@ -18,27 +18,49 @@
 //
 //     import "some-package"
 //
-
-// Include phoenix_html to handle method=PUT/DELETE in forms and buttons.
+import "./socket"
 import "phoenix_html"
-// Establish Phoenix Socket and LiveView configuration.
+import topbar from "../vendor/topbar"
+import Alpine from "alpinejs"
+import "./theme_switcher"
+
 import {Socket} from "phoenix"
 import {LiveSocket} from "phoenix_live_view"
-import topbar from "topbar"
-// import Alpine
-import Alpine from "alpinejs"
+import {InitFlash} from "./init_flash"
+import {InitCheckout} from "./init_checkout"
+import {InitModal} from "./init_modal"
 
-// Add this before your liveSocket call.
-window.Alpine = Alpine;
-Alpine.start();
+let Hooks = {}
+Hooks.InitFlash = InitFlash
+Hooks.InitCheckout = InitCheckout
+Hooks.InitModal = InitModal
+
+window.Alpine = Alpine
+Alpine.start()
 
 let csrfToken = document.querySelector("meta[name='csrf-token']").getAttribute("content")
-let liveSocket = new LiveSocket("/live", Socket, {params: {_csrf_token: csrfToken}})
+let liveSocket = new LiveSocket("/live", Socket, {
+  hooks: Hooks,
+  params: {_csrf_token: csrfToken},
+  dom: {
+    onBeforeElUpdated(from, to) {
+      if (from._x_dataStack) {
+        window.Alpine.clone(from, to)
+      }
+    }
+  }
+})
 
 // Show progress bar on live navigation and form submits
-topbar.config({barColors: {0: "#29d"}, shadowColor: "rgba(0, 0, 0, .3)"})
-window.addEventListener("phx:page-loading-start", info => topbar.show())
-window.addEventListener("phx:page-loading-stop", info => topbar.hide())
+topbar.config({ barColors: { 0: '#29d' }, shadowColor: 'rgba(0, 0, 0, .3)' })
+window.addEventListener('phx:page-loading-start', info => topbar.show())
+window.addEventListener('phx:page-loading-stop', info => topbar.hide())
+
+// Close modals and dropdowns on page leave
+// Add a x-on:page-leave="open = false" to an element that has x-data on it
+window.addEventListener("phx:page-loading-start", info => {
+  document.querySelectorAll('[x-data]').forEach(el => el.dispatchEvent(new CustomEvent('page-leave')))
+})
 
 // connect if there are any LiveViews on the page
 liveSocket.connect()

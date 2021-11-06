@@ -32,8 +32,12 @@ defmodule PraxkitWeb.ConnCase do
   end
 
   setup tags do
-    pid = Ecto.Adapters.SQL.Sandbox.start_owner!(Praxkit.Repo, shared: not tags[:async])
-    on_exit(fn -> Ecto.Adapters.SQL.Sandbox.stop_owner(pid) end)
+    :ok = Ecto.Adapters.SQL.Sandbox.checkout(Praxkit.Repo)
+
+    unless tags[:async] do
+      Ecto.Adapters.SQL.Sandbox.mode(Praxkit.Repo, {:shared, self()})
+    end
+
     {:ok, conn: Phoenix.ConnTest.build_conn()}
   end
 
@@ -46,8 +50,10 @@ defmodule PraxkitWeb.ConnCase do
   test context.
   """
   def register_and_log_in_user(%{conn: conn}) do
-    user = Praxkit.AccountsFixtures.user_fixture()
-    %{conn: log_in_user(conn, user), user: user}
+    account = Praxkit.AccountsFixtures.account_fixture()
+    Praxkit.BillingFixtures.active_subscription_fixture(account)
+    user = Praxkit.AccountsFixtures.user_fixture(account)
+    %{conn: log_in_user(conn, user), user: user, account: account}
   end
 
   @doc """
@@ -56,10 +62,47 @@ defmodule PraxkitWeb.ConnCase do
   It returns an updated `conn`.
   """
   def log_in_user(conn, user) do
-    token = Praxkit.Accounts.generate_user_session_token(user)
-
     conn
     |> Phoenix.ConnTest.init_test_session(%{})
-    |> Plug.Conn.put_session(:user_token, token)
+    |> Pow.Plug.assign_current_user(user, otp_app: :praxkit)
+    |> Plug.Conn.put_session(:current_user_id, user.id)
+    |> Plug.Conn.put_session(:current_account_id, user.account_id)
+  end
+
+  @doc """
+  Setup helper that registers and logs in admins.
+
+      setup :register_and_log_in_admin
+
+  It stores an updated connection and a registered admin in the
+  test context.
+  """
+  def register_and_log_in_admin(%{conn: conn}) do
+    admin = Praxkit.AdminsFixtures.admin_fixture()
+    %{conn: log_in_admin(conn, admin), admin: admin}
+  end
+
+  @doc """
+  Logs the given `admin` into the `conn`.
+
+  It returns an updated `conn`.
+  """
+  def log_in_admin(conn, admin) do
+    conn
+    |> Phoenix.ConnTest.init_test_session(%{})
+    |> Praxkit.Admins.Guardian.Plug.sign_in(admin)
+  end
+
+
+  @doc """
+  Switches the admin to use a spefic users account
+
+  It returns an updated `conn`.
+  """
+  def switch_account(%{conn: conn, account: account}) do
+    %{conn: Plug.Conn.put_session(conn, :admin_account_id, account.id)}
+  end
+  def switch_account(%{conn: conn, user: user}) do
+    %{conn: Plug.Conn.put_session(conn, :admin_account_id, user.account_id)}
   end
 end
