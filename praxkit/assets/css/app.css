@@ -27,11 +27,11 @@
 }
 
 .chart text {
-  @apply text-base-content fill-current !important;
+  @layer text-base-content fill-current !important;
 }
 
 .exc-domain, .exc-tick line {
-  @apply text-base-content text-opacity-50 stroke-current !important;
+  @layer text-base-content text-opacity-50 stroke-current !important;
 }
 
 @tailwind utilities;
